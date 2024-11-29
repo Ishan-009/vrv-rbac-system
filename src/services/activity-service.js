@@ -1,7 +1,6 @@
 const prisma = require('../lib/prisma');
-const AppError = require('../utils/error/app-error');
-const { StatusCodes } = require('http-status-codes');
 const { ROLES } = require('../config/constants');
+const handleError = require('../utils/error/error-handler');
 
 class ActivityService {
   async getActivityLogs(userRole) {
@@ -13,12 +12,12 @@ class ActivityService {
         where.user = {
           role: {
             name: {
-              not: ROLES.ADMIN, // Exclude admin logs for moderators
+              not: ROLES.ADMIN,
             },
           },
         };
       }
-      // If admin, they can see all logs
+
       return await prisma.activityLog.findMany({
         where,
         include: {
@@ -40,11 +39,7 @@ class ActivityService {
         },
       });
     } catch (error) {
-      if (error instanceof AppError) throw error;
-      throw new AppError(
-        'Internal Server Error',
-        StatusCodes.INTERNAL_SERVER_ERROR
-      );
+      handleError(error);
     }
   }
 }

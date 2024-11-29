@@ -1,6 +1,5 @@
 const userService = require('../services/user-service');
 const { StatusCodes } = require('http-status-codes');
-const AppError = require('../utils/error/app-error');
 
 const getUsers = async (req, res, next) => {
   try {
@@ -13,7 +12,7 @@ const getUsers = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
-    const user = await userService.getUserById(req.params.id);
+    const user = await userService.getUserById(req.params.id, req.user);
     return res.sendSuccess(user, 'User Data', StatusCodes.OK);
   } catch (error) {
     next(error);
@@ -23,7 +22,11 @@ const getUserById = async (req, res, next) => {
 const createUser = async (req, res, next) => {
   try {
     const user = await userService.createUser(req.body, req.user.userId);
-    return res.sendSuccess(user, 'User Created successfully', StatusCodes.OK);
+    return res.sendSuccess(
+      user,
+      'User Created successfully',
+      StatusCodes.CREATED
+    );
   } catch (error) {
     next(error);
   }

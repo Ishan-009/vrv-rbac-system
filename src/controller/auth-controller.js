@@ -17,7 +17,6 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const data = await authService.login(req.body);
-    console.log(data);
 
     return res.sendSuccess(data, 'User Login successfully', StatusCodes.OK);
   } catch (error) {
@@ -36,22 +35,8 @@ const logout = async (req, res, next) => {
   }
 };
 
-const forgetPassword = (req, res, next) => {
-  return res
-    .json({ message: 'Forget-Password', status: true })
-    .status(StatusCodes.OK);
-};
-
-const resetPassword = (req, res, next) => {
-  return res
-    .json({ message: 'Reset Password', status: true })
-    .status(StatusCodes.OK);
-};
-
 module.exports = {
   login,
   register,
-  forgetPassword,
-  resetPassword,
   logout,
 };

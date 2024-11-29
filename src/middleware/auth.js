@@ -40,12 +40,12 @@ const hasPermission = (requiredPermissions) => {
 
   return async (req, res, next) => {
     try {
-      const role = await prisma.role.findFirst({
+      const role = await prisma.role.findUnique({
         where: { name: req.user.role },
       });
 
       if (!role) {
-        return res.sendError('Role not found', null, StatusCodes.FORBIDDEN);
+        return res.sendError('Role not found', null, StatusCodes.NOT_FOUND);
       }
 
       const hasRequired = permissions.every((permission) =>

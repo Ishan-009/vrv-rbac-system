@@ -1,6 +1,5 @@
 const roleService = require('../services/role-service');
 const { StatusCodes } = require('http-status-codes');
-const AppError = require('../utils/error/app-error');
 
 const getRoles = async (req, res, next) => {
   try {
@@ -23,7 +22,11 @@ const getRoleById = async (req, res, next) => {
 const createRole = async (req, res, next) => {
   try {
     const role = await roleService.createRole(req.body, req.user.userId);
-    return res.sendSuccess(role, 'Role Created Successfully', StatusCodes.OK);
+    return res.sendSuccess(
+      role,
+      'Role Created Successfully',
+      StatusCodes.CREATED
+    );
   } catch (error) {
     next(error);
   }

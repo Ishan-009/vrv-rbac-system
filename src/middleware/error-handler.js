@@ -6,6 +6,14 @@ const errorHandler = (err, req, res, next) => {
       success: false,
     });
   }
+
+  if (err.name === 'NotFoundError') {
+    return res.status(404).json({
+      status: 'error',
+      message: 'Resource not found',
+    });
+  }
+
   //  generic error handler
   return res.status(500).json({
     message: 'Internal server error',

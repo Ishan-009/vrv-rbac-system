@@ -1,0 +1,265 @@
+============= API Documentation =================
+
+Before moving towards API Documenation
+
+// Refer this starting base  Role and permissions in order to understand which user role has which permissions
+const ROLES = {
+  ADMIN: 'ADMIN',
+  MODERATOR: 'MODERATOR',
+  USER: 'USER',
+};
+
+const PERMISSIONS = {
+  CREATE_USER: 'CREATE_USER',
+  READ_USER: 'READ_USER',
+  UPDATE_USER: 'UPDATE_USER',
+  DELETE_USER: 'DELETE_USER',
+  MANAGE_ROLES: 'MANAGE_ROLES',
+  CREATE_POST: 'CREATE_POST',
+  READ_POST: 'READ_POST',
+  UPDATE_POST: 'UPDATE_POST',
+  DELETE_POST: 'DELETE_POST',
+  VIEW_ACTIVITY: 'VIEW_ACTIVITY',
+};
+
+const ROLE_PERMISSIONS = {
+  [ROLES.ADMIN]: Object.values(PERMISSIONS),
+  [ROLES.MODERATOR]: [
+    PERMISSIONS.READ_USER,
+    PERMISSIONS.UPDATE_USER,
+    PERMISSIONS.CREATE_POST,
+    PERMISSIONS.READ_POST,
+    PERMISSIONS.UPDATE_POST,
+    PERMISSIONS.DELETE_POST,
+    PERMISSIONS.VIEW_ACTIVITY,
+  ],
+  [ROLES.USER]: [
+    PERMISSIONS.CREATE_POST,
+    PERMISSIONS.READ_POST,
+    PERMISSIONS.UPDATE_POST,
+    PERMISSIONS.DELETE_POST,
+  ],
+};
+
+module.exports = {
+  ROLES,
+  PERMISSIONS,
+  ROLE_PERMISSIONS,
+};
+
+
+
+(Due to to lesser time I had to lean towards creating simple API Documentation)
+
+
+/api/v1/healthy :- healthy server endpoint check (no inputs)
+
+====== Authentication
+
+Post Request:- /api/v1/auth/login
+Input:- email, password (json input)
+output:- user login message with displaying logged in user data and jwt token
+
+
+Post Request :- /api/v1/auth/register
+Input:- username,email,password
+output:- user register message with dislpaying registered user data and jwt token
+
+
+(After this point onwards, you need to add token to every request in order to access the route, you need to add auth bearer token to the headers, go to postman and paste the token under the option of bearer token, it will automatically add bearer as prefix to the token )
+
+(And also certain routes may have certain roles and permissions on the base of that you will get access to the routes and perform operations)
+
+
+==========   USER API ([BEARER TOKEN REQUIRED])
+
+=== View All Users
+GET:- /api/v1/users/
+Roles that can view this endpoint:- USER, MODERATOR
+(Moderator can see all users but cannot see admins )
+(ADMIN can see all users and itself too)
+
+No Inputs
+
+output:- all users related data
+
+=== View Particular User
+GET:- /api/v1/users/:id   (Id Params)
+
+No Inputs
+
+Roles Access:- ADMIN, MODERATOR
+
+description:- admin can see moderator and other users data by their id, same for moderator too but one exception moderator cannot see admin by its id too.
+
+output:- get particular user data
+
+=== CREATE USER
+POST:- /api/v1/users/
+
+Role that can access :- ADMIN
+
+INPUT:- username,email,password,roleId
+
+output:- creates user with particular selected role
+
+=== UPDATE USER
+PUT :- /api/v1/users/:id (ID Params)
+
+Roles that can access:- ADMIN, MODERATOR
+INPUT:- username, email, password, roleId
+
+
+output:- updates user data
+
+
+==== Delete User
+
+DELETE:- /api/v1/users/:id (ID Params)
+
+Roles that can access :- ADMIN
+
+No Inputs
+
+Output :- Deletes User Data
+
+========= Activity API  ([BEARER TOKEN REQUIRED])
+
+==== Fetch Activity Logs
+
+GET:- /api/v1/acitivity/
+
+Roles that can access :- ADMIN, MODERATOR
+
+Output:- Gets ACtivity Log of User performed operations like user created post, deleted poist and all that, it gives all Activity log performed in our system
+
+
+======= POSTS API  ([BEARER TOKEN REQUIRED])
+
+ === Fetch All Posts
+GET: /api/v1/posts/
+
+Roles that can Access :- ADMIN, Moderator, User
+
+// Scope:-  , Scope of different roles see posts on this route is different, admin can see all posts, user can see only own post, moderator can see all posts
+
+Output:- Fetches all the post according to the roles scope
+
+=== Fetch Particular Post by Id
+
+GET: /api/v1/posts/:id (ID Params)
+
+Roles that can access :- ADMIN, Moderator, User
+
+Output :- Fetch Particular post by post Id
+
+
+
+POST:- /api/v1/posts/
+
+Roles that can access :- ADMIN, Moderator, User
+
+INPUTS :- title,content
+
+Output:- creates post and assigns it to the creator Id
+
+=== Update Post
+
+PUT :- /api/v1/posts/:id (ID Params)
+
+Roles that can access :- ADMIN, Moderator, User
+
+// admin , moderator can their update their own and   post of role "users" , and user role can update its own post only
+
+Inputs :-  title, content
+
+Output: updates the post
+
+=== Delete Post
+
+DELETE :- /api/v1/posts/:id  (ID Params)
+
+Roles that can access :- ADMIN, Moderator, USER
+
+// admin can delete anybody posts, moderator can delete anybody post except admin, and user can delete its  own post
+
+OUTPUT:- Deletes the post by Id
+
+
+
+======== Role API  ([BEARER TOKEN REQUIRED])
+
+=== VIEW ALL ROLES
+
+GET :- /api/v1/roles/
+
+Roles that can access the route :- ADMIN
+
+OUTPUT:- Fetches ALL Roles Data
+
+
+==== FETCH Particular Role
+
+GET :- /api/v1/roles/:id (Id params)
+
+Roles that can access the route :- ADMIN
+
+OUTPUT:- Fetches Particular Role by Id
+
+
+==== CREATE Role
+
+Post :- /api/v1/roles/
+
+Roles that can access the route :- ADMIN
+
+Inputs :- name,
+permissions[array] example:- "permissions": [
+            "READ_USER",
+            "UPDATE_USER",
+            "CREATE_POST",
+            "READ_POST",
+            "UPDATE_POST",
+            "DELETE_POST",
+            "VIEW_ACTIVITY"
+        ]
+
+        values of permissions should be from permissions object defined in config/constant file or you can also refer this at top of documentation
+
+OUTPUT:- CREATE ROLE
+
+
+
+===== UPDATE Role
+
+PUT : /api/v1/roles/:id (Id Params)
+Roles that can access the route :- ADMIN
+Inputs :- name
+,permissions[array]:- example:-  "permissions": [
+            "READ_USER",
+            "UPDATE_USER",
+            "CREATE_POST",
+            "READ_POST",
+            "UPDATE_POST",
+            "DELETE_POST",
+            "VIEW_ACTIVITY"
+        ]
+
+Output:- Updates  Role
+
+
+=== Delete  Role
+DELETE:- /api/v1/roles/:id (Id params)
+Roles that can access the route :- ADMIN
+
+Output :- Deletes Role
+
+
+// The speciality in this role based access system is that not only it is role and permissions based access system on various routes/feaatures of the system but also scope of the each role is different in terms of what they can do permission activity to what extend,
+
+CRUX Speciality :-  like moderator role user who has view user permissions then also it cant view admin user , one moderator cannot update/delete posts of another moderator, means roles which have same permissions cannot modify other roles which have same permissions as them , they can perform to the  roles on lower level  which do not have permissions, thus maintaining hierarcical role scope management and other scope level features according to role irrespective of having permissions
+
+
+// There are more such scope level cases in this project
+
+

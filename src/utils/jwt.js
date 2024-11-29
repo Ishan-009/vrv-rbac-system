@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../config/server-config');
+const { JWT_SECRET, JWT_EXPIRY } = require('../config/server-config');
 
 class JWTUtil {
   static async generateToken(payload) {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRY });
   }
 
   static async verifyToken(token) {
